@@ -1,0 +1,148 @@
+import 'package:flutter/material.dart';
+
+class TvRemote extends StatelessWidget {
+  final VoidCallback onPower;
+  final VoidCallback onUp;
+  final VoidCallback onDown;
+  final VoidCallback onLeft;
+  final VoidCallback onRight;
+  final VoidCallback onOk;
+  final VoidCallback onVolumeUp;
+  final VoidCallback onVolumeDown;
+  final VoidCallback onChannelUp;
+  final VoidCallback onChannelDown;
+  final ValueChanged<int> onNumberPressed; 
+
+  const TvRemote({
+    Key? key,
+    required this.onPower,
+    required this.onUp,
+    required this.onDown,
+    required this.onLeft,
+    required this.onRight,
+    required this.onOk,
+    required this.onVolumeUp,
+    required this.onVolumeDown,
+    required this.onChannelUp,
+    required this.onChannelDown,
+    required this.onNumberPressed,
+  }) : super(key: key);
+
+  Widget _buildButton({
+    required String label,
+    IconData? icon,
+    required VoidCallback onPressed,
+    double size = 60,
+    bool isSquare = false,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        minimumSize: Size(size, size),
+        shape: isSquare ? const RoundedRectangleBorder() : const CircleBorder(),
+        padding: EdgeInsets.all(size * 0.1),
+      ),
+      child: icon != null
+          ? Icon(icon, size: size * 0.4)
+          : Text(
+              label,
+              style: TextStyle(fontSize: size * 0.3),
+            ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final buttonSize = screenWidth * 0.12; 
+    final spacing = buttonSize * 0.2; 
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _buildButton(
+                label: '',
+                icon: Icons.power_settings_new,
+                onPressed: onPower,
+                size: buttonSize,
+              ),
+            ],
+          ),
+
+          SizedBox(height: spacing * 2),
+
+          Column(
+            children: [
+              _buildButton(label: '', icon: Icons.arrow_upward, onPressed: onUp, size: buttonSize),
+              SizedBox(height: spacing),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildButton(label: '', icon: Icons.arrow_back, onPressed: onLeft, size: buttonSize),
+                  SizedBox(width: spacing),
+                  _buildButton(label: 'OK', onPressed: onOk, size: buttonSize),
+                  SizedBox(width: spacing),
+                  _buildButton(label: '', icon: Icons.arrow_forward, onPressed: onRight, size: buttonSize),
+                ],
+              ),
+              SizedBox(height: spacing),
+              _buildButton(label: '', icon: Icons.arrow_downward, onPressed: onDown, size: buttonSize),
+            ],
+          ),
+
+          SizedBox(height: spacing * 2),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildButton(label: 'Vol+', onPressed: onVolumeUp, size: buttonSize),
+              _buildButton(label: 'Vol-', onPressed: onVolumeDown, size: buttonSize),
+              _buildButton(label: 'Ch+', onPressed: onChannelUp, size: buttonSize),
+              _buildButton(label: 'Ch-', onPressed: onChannelDown, size: buttonSize),
+            ],
+          ),
+
+          SizedBox(height: spacing * 2),
+Expanded(
+  child: LayoutBuilder(
+    builder: (context, constraints) {
+      double squareSize = constraints.maxWidth / 5; 
+
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 items per row
+          mainAxisSpacing: 8.0, // Adjust spacing
+          crossAxisSpacing: 8.0, // Adjust spacing
+          childAspectRatio: 1, // Ensures square items
+        ),
+        itemCount: 5, 
+        itemBuilder: (context, index) {
+          int number = index + 1;
+          return SizedBox(
+            width: squareSize,
+            height: squareSize,
+            child: _buildButton(
+              label: '$number',
+              onPressed: () => onNumberPressed(number),
+              size: squareSize, 
+              isSquare: true,
+            ),
+          );
+        },
+      );
+    },
+  ),
+),
+
+        ],
+      ),
+    );
+  }
+}
